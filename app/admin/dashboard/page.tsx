@@ -270,61 +270,6 @@ const AdminDashboard = () => {
             </button>
           </div>
 
-          {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {stats.map((item, index) => {
-              const Icon = item.icon;
-
-              return (
-                <div
-                  key={item.title}
-                  className="group animate-in fade-in slide-in-from-bottom-5 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                  style={{
-                    animationDelay: `${index * 100}ms`,
-                  }}
-                >
-                  <Link
-                    href={item.link}
-                    className="block"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">
-                          {item.title}
-                        </p>
-                        <h3
-                          className={`mt-2 text-2xl font-bold sm:text-3xl ${item.valueColor}`}
-                        >
-                        {pendingComplaint.length}
-                        </h3>
-                      </div>
-
-                      <div
-                        className={`flex h-12 w-12 items-center justify-center rounded-xl ${item.iconBg} transition duration-300 group-hover:scale-110 group-hover:rotate-3`}
-                      >
-                        <Icon
-                          size={23}
-                          className={item.iconColor}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex items-center gap-2 text-xs">
-                      <span className="flex items-center gap-1 rounded-full bg-green-50 px-2 py-1 font-semibold text-green-600">
-                        <TrendingUp size={12} />
-                        {item.change}
-                      </span>
-
-                      <span className="text-gray-400">
-                        {item.description}
-                      </span>
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
-          </div> */}
-
-
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div
               className="group animate-in fade-in slide-in-from-bottom-5 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
@@ -337,7 +282,7 @@ const AdminDashboard = () => {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-500">
-                      Pending Complaints
+                       Total Flats
                     </p>
 
                     <h3 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
@@ -366,6 +311,7 @@ const AdminDashboard = () => {
                 </div>
               </Link>
             </div>
+
             <div
               className="group animate-in fade-in slide-in-from-bottom-5 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
@@ -489,15 +435,6 @@ const AdminDashboard = () => {
               </Link>
             </div>
           </div>
-          {/* </div> */}
-
-          {/* {pendingComplaint.map((item) => {
-            return (
-              <div key={item._id}>
-                {item.title}
-              </div>
-            );
-          })} */}
         </section>
 
         {/* ================= CONTENT ================= */}
