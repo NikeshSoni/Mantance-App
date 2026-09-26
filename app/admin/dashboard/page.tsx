@@ -28,19 +28,19 @@ import Navbar from "../navbar/Navbar";
 
 import { getAllComplaints } from "@/app/services/complaint.service";
 import { Complaint } from "@/app/types/complaint";
+import { getBuildings } from "@/app/services/buildingService";
+
 
 const AdminDashboard = () => {
   const router = useRouter();
-  // const [mobileMenu, setMobileMenu] = useState(false);
-
-
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("");
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // const [complaints, setComplaints] = useState<Complaint[]>([]);
+
+
   const [pendingComplaint, setPendingComplaint] = useState<Complaint[]>([]);
 
   const fetchComplaints = async () => {
@@ -73,7 +73,6 @@ const AdminDashboard = () => {
 
   console.log("Pending complaints:", pendingComplaint);
 
-
   useEffect(() => {
     fetchComplaints();
   }, [statusFilter]);
@@ -91,54 +90,34 @@ const AdminDashboard = () => {
     }
   }, [router]);
 
-  const stats = [
-    {
-      title: "Total Residents",
-      value: "245",
-      change: "+12.5%",
-      description: "vs last month",
-      icon: Users,
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
-      valueColor: "text-gray-900",
-      link: "/admin/residents",
-    },
-    {
-      title: "Total Flats",
-      value: "120",
-      change: "+4.2%",
-      description: "vs last month",
-      icon: Building2,
-      iconBg: "bg-purple-100",
-      iconColor: "text-purple-600",
-      valueColor: "text-gray-900",
-      link: "/admin/flats",
-    },
-    {
-      title: "Pending Complaints",
-      value: "18",
-      change: "-8.4%",
-      description: "vs last month",
-      icon: Wrench,
-      iconBg: "bg-red-100",
-      iconColor: "text-red-600",
-      valueColor: "text-red-600",
-      link: "/admin/complaints",
-    },
-    {
-      title: "Maintenance Collection",
-      value: "₹3,25,000",
-      change: "+14.8%",
-      description: "vs last month",
-      icon: IndianRupee,
-      iconBg: "bg-green-100",
-      iconColor: "text-green-600",
-      valueColor: "text-green-600",
-      link: "/admin/maintenance",
-    },
-  ];
+  //    fetch Building for the data 
 
 
+  const [totalBuildings, setTotalBuildings] = useState(0);
+  // const [loading, setLoading] = useState(true);
+
+  const fetchTotalBuildings = async () => {
+    try {
+      setLoading(true);
+
+      const response = await getBuildings();
+
+      setTotalBuildings(response.count);
+    } catch (error) {
+      console.error(
+        "Failed to fetch total buildings:",
+        error
+      );
+
+      setTotalBuildings(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalBuildings();
+  }, []);
 
   const payments = [
     {
@@ -177,15 +156,18 @@ const AdminDashboard = () => {
       hover: "hover:border-blue-300 hover:bg-blue-50",
       action: () => router.push("/admin/resident"),
     },
+
+    // ✅ ONLY ONE BUILDINGS ITEM
     {
-      title: "Flats",
+      title: loading ? `Buildings (${totalBuildings})` : `Buildings (${totalBuildings})`,
       description: "Manage properties",
       icon: Building2,
       color: "text-purple-600",
       bg: "bg-purple-50",
       hover: "hover:border-purple-300 hover:bg-purple-50",
-      action: () => { },
+      action: () => router.push("/admin/buildings"),
     },
+
     {
       title: "Bills",
       description: "Manage payments",
@@ -195,6 +177,7 @@ const AdminDashboard = () => {
       hover: "hover:border-green-300 hover:bg-green-50",
       action: () => { },
     },
+
     {
       title: "Requests",
       description: "Member requests",
@@ -204,8 +187,11 @@ const AdminDashboard = () => {
       hover: "hover:border-orange-300 hover:bg-orange-50",
       action: () => router.push("/admin/memberrequests"),
     },
+
     {
-      title: "Complaints",
+      title: loading
+        ? "Loading..."
+        : `Complaints (${pendingComplaint.length})`,
       description: "View complaints",
       icon: Wrench,
       color: "text-red-600",
@@ -213,6 +199,7 @@ const AdminDashboard = () => {
       hover: "hover:border-red-300 hover:bg-red-50",
       action: () => { },
     },
+
     {
       title: "Settings",
       description: "System settings",
@@ -256,185 +243,51 @@ const AdminDashboard = () => {
 
         {/* ================= STATS ================= */}
         <section className="mb-8">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold">Overview</h2>
+          <section className="mt-8">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold">Quick Actions</h2>
               <p className="text-sm text-gray-500">
-                Society performance at a glance
+                Quickly access important sections
               </p>
             </div>
 
-            <button className="hidden items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 sm:flex">
-              View Reports
-              <ArrowUpRight size={16} />
-            </button>
-          </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+              {quickActions.map((action, index) => {
+                const Icon = action.icon;
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <div
-              className="group animate-in fade-in slide-in-from-bottom-5 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-            >
-              <Link
-                href="/admin/complaints?status=Pending"
-                className="block"
-              >
-                {/* Top Section */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">
-                       Total Flats
+                return (
+                  <button
+                    key={action.title}
+                    onClick={action.action}
+                    className={`group animate-in fade-in zoom-in rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${action.hover}`}
+                    style={{
+                      animationDelay: `${index * 80}ms`,
+                    }}
+                  >
+                    <div
+                      className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${action.bg} transition duration-300 group-hover:scale-110`}
+                    >
+                      <Icon size={21} className={action.color} />
+                    </div>
+
+                    <p className="text-sm font-bold">{action.title}</p>
+
+                    <p className="mt-1 hidden text-xs text-gray-400 sm:block">
+                      {action.description}
                     </p>
 
-                    <h3 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
-                      {pendingComplaint.length}
-                    </h3>
-                  </div>
-
-                  {/* Icon */}
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 transition duration-300 group-hover:scale-110 group-hover:rotate-3">
-                    <Clock3
-                      size={23}
-                      className="text-amber-600"
-                    />
-                  </div>
-                </div>
-
-                {/* Bottom Section */}
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-xs text-gray-400">
-                    Take an action!
-                  </span>
-
-                  <span className="text-xs font-semibold text-gray-900 transition-transform duration-300 group-hover:translate-x-1">
-                    View →
-                  </span>
-                </div>
-              </Link>
+                    <div className="mt-3 flex items-center text-xs font-medium text-gray-400 transition group-hover:text-blue-600">
+                      Open
+                      <ArrowUpRight
+                        size={13}
+                        className="ml-1 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-
-            <div
-              className="group animate-in fade-in slide-in-from-bottom-5 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-            >
-              <Link
-                href="/admin/complaints?status=Pending"
-                className="block"
-              >
-                {/* Top Section */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Pending Complaints
-                    </p>
-
-                    <h3 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
-                      {pendingComplaint.length}
-                    </h3>
-                  </div>
-
-                  {/* Icon */}
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 transition duration-300 group-hover:scale-110 group-hover:rotate-3">
-                    <Clock3
-                      size={23}
-                      className="text-amber-600"
-                    />
-                  </div>
-                </div>
-
-                {/* Bottom Section */}
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-xs text-gray-400">
-                    Take an action!
-                  </span>
-
-                  <span className="text-xs font-semibold text-gray-900 transition-transform duration-300 group-hover:translate-x-1">
-                    View →
-                  </span>
-                </div>
-              </Link>
-            </div>
-
-            <div
-              className="group animate-in fade-in slide-in-from-bottom-5 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-            >
-              <Link
-                href="/admin/complaints?status=Pending"
-                className="block"
-              >
-                {/* Top Section */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Pending Complaints
-                    </p>
-
-                    <h3 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
-                      {pendingComplaint.length}
-                    </h3>
-                  </div>
-
-                  {/* Icon */}
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 transition duration-300 group-hover:scale-110 group-hover:rotate-3">
-                    <Clock3
-                      size={23}
-                      className="text-amber-600"
-                    />
-                  </div>
-                </div>
-
-                {/* Bottom Section */}
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-xs text-gray-400">
-                    Take an action!
-                  </span>
-
-                  <span className="text-xs font-semibold text-gray-900 transition-transform duration-300 group-hover:translate-x-1">
-                    View →
-                  </span>
-                </div>
-              </Link>
-            </div>
-
-            <div
-              className="group animate-in fade-in slide-in-from-bottom-5 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-            >
-              <Link
-                href="/admin/complaints?status=Pending"
-                className="block"
-              >
-                {/* Top Section */}
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Pending Complaints
-                    </p>
-
-                    <h3 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
-                      {pendingComplaint.length}
-                    </h3>
-                  </div>
-
-                  {/* Icon */}
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 transition duration-300 group-hover:scale-110 group-hover:rotate-3">
-                    <Clock3
-                      size={23}
-                      className="text-amber-600"
-                    />
-                  </div>
-                </div>
-
-                {/* Bottom Section */}
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-xs text-gray-400">
-                    Take an action!
-                  </span>
-
-                  <span className="text-xs font-semibold text-gray-900 transition-transform duration-300 group-hover:translate-x-1">
-                    View →
-                  </span>
-                </div>
-              </Link>
-            </div>
-          </div>
+          </section>
         </section>
 
         {/* ================= CONTENT ================= */}
@@ -791,52 +644,7 @@ const AdminDashboard = () => {
           </div>
         </section>
 
-        {/* ================= QUICK ACTIONS ================= */}
-        <section className="mt-8">
-          <div className="mb-4">
-            <h2 className="text-xl font-bold">Quick Actions</h2>
-            <p className="text-sm text-gray-500">
-              Quickly access important sections
-            </p>
-          </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {quickActions.map((action, index) => {
-              const Icon = action.icon;
-
-              return (
-                <button
-                  key={action.title}
-                  onClick={action.action}
-                  className={`group animate-in fade-in zoom-in rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${action.hover}`}
-                  style={{
-                    animationDelay: `${index * 80}ms`,
-                  }}
-                >
-                  <div
-                    className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${action.bg} transition duration-300 group-hover:scale-110`}
-                  >
-                    <Icon size={21} className={action.color} />
-                  </div>
-
-                  <p className="text-sm font-bold">{action.title}</p>
-
-                  <p className="mt-1 hidden text-xs text-gray-400 sm:block">
-                    {action.description}
-                  </p>
-
-                  <div className="mt-3 flex items-center text-xs font-medium text-gray-400 transition group-hover:text-blue-600">
-                    Open
-                    <ArrowUpRight
-                      size={13}
-                      className="ml-1 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    />
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </section>
 
         {/* ================= FOOTER ================= */}
         <footer className="mt-10 border-t border-gray-200 pt-5 text-center text-xs text-gray-400">

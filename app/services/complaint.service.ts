@@ -3,7 +3,7 @@ import {
   Complaint,
   CreateComplaintData,
   ComplaintActionData,
-} from "../types/complaint.type.ts";
+} from "../types/complaint";
 
 export const createComplaint = async (
   data: CreateComplaintData

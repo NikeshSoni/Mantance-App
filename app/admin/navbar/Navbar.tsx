@@ -12,12 +12,21 @@ import {
   LogOut,
   ShieldCheck,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import LogoutBtn from "@/app/auth/logutBtn/page";
+import { logoutUser, getUser, UserProfile } from "../../services/auth.service";
 
 export default function Navbar() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logoutUser();
+    router.replace("/auth/login");
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-2xl">
@@ -130,9 +139,8 @@ export default function Navbar() {
 
               <ChevronDown
                 size={16}
-                className={`hidden text-slate-400 transition-transform duration-300 lg:block ${
-                  profileOpen ? "rotate-180" : ""
-                }`}
+                className={`hidden text-slate-400 transition-transform duration-300 lg:block ${profileOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
@@ -171,11 +179,19 @@ export default function Navbar() {
                   Settings
                 </button> */}
 
+
+
                 <div className="my-1 h-px bg-slate-100" />
 
-                {/* <div className="px-1">
-                  <LogoutBtn />
-                </div> */}
+                
+
+                <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 group"
+                        >
+                            <LogOut size={18} className="group-hover:scale-110 transition-transform" />
+                            <span className="text-sm font-medium">Sign Out</span>
+                        </button>
               </div>
             )}
           </div>
